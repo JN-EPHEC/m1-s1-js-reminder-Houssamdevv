@@ -1,23 +1,41 @@
-/** 
- * This is a simple example of a TypeScript program that runs in Node.js.
- * It demonstrates basic TypeScript syntax, type annotations, and function usage.
- * 
- * Your job is to answer to the exercices described in the README.md file.
- * 
- * (You can delete the below block of code to do your exercises)
- * 
- * For the -- main -- branch containing your -- homework --:
- *      - You will find a README.md file with the instructions for the exercises.
- *      - Your code will be executed automatically to grade your work.
- *      - So please, use the exact same file names and structure as described in the README.md.
- * 
- * Let's get started!
- * **/
+/**
+ * Prompts used:
+ * - "Guide-moi étape par étape pour mettre en place le devoir."
+ * - "Écris la fonction fetchAndFilterTodos qui utilise fetch, vérifie res.ok,
+ *    parse le JSON, filtre completed:true, log le nombre et les titres,
+ *    et gère les erreurs avec try...catch."
+ */
 
-const message: string = "Hello, TypeScript with Node.js!";
+type Todo = {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+};
 
-function sayHello(msg: string): void {
-    console.log(msg);
+const TODOS_URL = "https://jsonplaceholder.typicode.com/todos";
+
+export async function fetchAndFilterTodos(): Promise<Todo[]> {
+  try {
+    const res = await fetch(TODOS_URL);
+
+    if (!res.ok) {
+      console.log("Network response was not ok");
+      return [];
+    }
+
+    const data: Todo[] = await res.json();
+    const completed = data.filter((t) => t.completed === true);
+
+    console.log("Number of completed tasks:", completed.length);
+    console.log("Titles of completed tasks:", completed.map((t) => t.title));
+
+    return completed;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.log("Network call failed:", message);
+    return [];
+  }
 }
 
-sayHello(message);
+fetchAndFilterTodos();
