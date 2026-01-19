@@ -1,0 +1,31 @@
+name: Autograding Tests
+'on':
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Check
+      id: check
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Check
+        setup-command: ''
+        command: if [ $(git rev-list --count HEAD) -gt 1 ]; then exit 0; else echo
+          "Aucun commit détecté"; exit 1; if
+        timeout: 1
+        max-score: 6
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        CHECK_RESULTS: "${{steps.check.outputs.result}}"
+      with:
+        runners: check
